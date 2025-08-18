@@ -1,0 +1,13 @@
+  # resources:
+jobs:
+  demo_job:
+    name: demo_job
+    tasks:
+      - task_key: notebook_task1
+        notebook_task:
+          notebook_path: ../notebook/notebook_1.ipynb
+          source: WORKSPACE
+    queue:
+      enabled: true
+    performance_target: STANDARD
+
