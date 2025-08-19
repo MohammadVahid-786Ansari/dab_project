@@ -1,0 +1,41 @@
+name: CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  cd-deploy-dev:
+    name: Deploy to DEV
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Databricks CLI
+        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install setuptools wheel
+
+      - name: Configure Databricks
+        run: |
+          # write out the profile (here called "TEST")
+          cat <<EOF > ~/.databrickscfg
+          [TEST]
+            host  = https://dbc-e380e487-14e8.cloud.databricks.com/
+            token = ${{ secrets.DB_token }}
+          EOF
+
+      - name: Deploy to DEV
+        run: |
+          databricks bundle deploy
