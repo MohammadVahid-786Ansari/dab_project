@@ -66,7 +66,7 @@ jobs:
           # write out the profile (here called "TEST")
           cat <<EOF > ~/.databrickscfg
           [TEST]
-            host  = https://dbc-e380e487-14e8.cloud.databricks.com/
+            host  = https://dbc-ba82de44-d338.cloud.databricks.com/
             token = ${{ secrets.DB_token_test }}
           EOF
 
