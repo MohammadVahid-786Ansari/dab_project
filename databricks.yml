@@ -11,6 +11,8 @@ include:
 variables:
   catalog:
    default: "citibike_dev"
+  dev_flag:
+    default: true 
 # resources:
 #   jobs:
 #     demo_job:
@@ -35,12 +37,18 @@ targets:
     workspace:
       host: https://dbc-e380e487-14e8.cloud.databricks.com
 
-  prod:
-    mode: production
+  test:
+    mode: production   # or production if you want strict deploys
+    variables:
+      catalog:
+        default: "citibike_test"
+      dev_flag:
+        default: false
+    presets:
+      name_prefix: '[testing] '    
     workspace:
-      host: https://dbc-e380e487-14e8.cloud.databricks.com
-      # We explicitly deploy to /Workspace/Users/ansarivahid547@gmail.com to make sure we only have a single copy.
-      root_path: /Workspace/Users/ansarivahid547@gmail.com/.bundle/${bundle.name}/${bundle.target}
+      host: https://dbc-ba82de44-d338.cloud.databricks.com
+      root_path: /Workspace/Users/freelancer548vm@gmail.com/.bundle/${bundle.name}/${bundle.target}
     permissions:
-      - user_name: ansarivahid547@gmail.com
+      - user_name: freelancer548vm@gmail.com
         level: CAN_MANAGE
