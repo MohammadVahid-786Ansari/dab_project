@@ -1,41 +1,43 @@
-name: Deploy Notebooks to Databricks
+name: Deploy Databricks Notebooks
 
 on:
   push:
     branches:
-      - main
+      - main   # adjust as needed
 
 jobs:
-  deploy:
+  deploy-notebooks:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Databricks CLI
+      - name: Install Databricks CLI (Go version)
         run: |
-          curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | sh
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
-      - name: Upload Notebooks to Databricks
+      - name: Configure and Upload Notebooks
+        env:
+          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
+          WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
         run: |
-          # Export auth vars so Databricks CLI picks them up
-          export DATABRICKS_HOST="https://dbc-e380e487-14e8.cloud.databricks.com"
-          export DATABRICKS_TOKEN="${{ secrets.DB_token }}"
+          # Confirm CLI + auth works
+          databricks version
+          databricks workspace list $WORKSPACE_PATH || echo "Workspace path not found, creating it"
 
-          # Make sure workspace folders exist
+          # Create workspace directories if they don't exist
           databricks workspace mkdirs $WORKSPACE_PATH/Bronze
           databricks workspace mkdirs $WORKSPACE_PATH/Silver
           databricks workspace mkdirs $WORKSPACE_PATH/Gold
-          databricks workspace mkdirs $WORKSPACE_PATH/Utils
 
-          # Import notebooks from repo into Databricks workspace
+          # Import local notebooks into Databricks workspace
           databricks workspace import-dir citibike_etl/notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
           databricks workspace import-dir citibike_etl/notebooks/silver $WORKSPACE_PATH/Silver --overwrite
           databricks workspace import-dir citibike_etl/notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
-          databricks workspace import-dir citibike_etl/notebooks/utils  $WORKSPACE_PATH/Utils  --overwrite
-        env:
-          WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
+
+
 
 
 
