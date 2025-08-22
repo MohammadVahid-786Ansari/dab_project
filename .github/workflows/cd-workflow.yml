@@ -22,25 +22,25 @@ jobs:
         run: databricks current-user me
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
 
       - name: Create Bronze folder
         run: databricks workspace mkdirs /Workspace/Bronze
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
 
       - name: Create Silver folder
         run: databricks workspace mkdirs /Workspace/Silver
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
 
       - name: Create Gold folder
         run: databricks workspace mkdirs /Workspace/Gold
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
 
       - name: Create Utils folder
         run: databricks workspace mkdirs /Workspace/Utils
