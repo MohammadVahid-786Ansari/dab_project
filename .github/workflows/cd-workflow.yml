@@ -21,10 +21,10 @@ jobs:
 
       - name: Deploy Bronze/Silver/Gold/Utils to Dev
         run: |
-          databricks workspace import_dir ./notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
-          databricks workspace import_dir ./notebooks/silver $WORKSPACE_PATH/Silver --overwrite
-          databricks workspace import_dir ./notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
-          databricks workspace import_dir ./notebooks/utils  $WORKSPACE_PATH/Utils  --overwrite
+          databricks workspace import_dir ./notebooks/bronze $WORKSPACE_PATH/Bronze --delete
+          databricks workspace import_dir ./notebooks/silver $WORKSPACE_PATH/Silver --delete
+          databricks workspace import_dir ./notebooks/gold   $WORKSPACE_PATH/Gold   --delete
+          databricks workspace import_dir ./notebooks/utils  $WORKSPACE_PATH/Utils  --delete
 
 
 # name: CD Workflow
