@@ -20,15 +20,17 @@ jobs:
       - name: Configure and Upload Notebooks
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_token }}   # 👈 must exist in GitHub secrets
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}   # 👈 must match your GitHub secret name
+          DATABRICKS_AUTH_TYPE: pat                   # 👈 force Personal Access Token auth
           WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
         run: |
-          # ✅ Verify auth
+          # ✅ Check CLI + auth
           databricks version
           databricks current-user me || { echo "❌ Auth failed - check DB_TOKEN secret"; exit 1; }
+
           echo "✅ Auth successful"
 
-          # ✅ Create workspace directories (idempotent)
+          # ✅ Create workspace dirs (idempotent)
           databricks workspace mkdirs "$WORKSPACE_PATH/Bronze"
           databricks workspace mkdirs "$WORKSPACE_PATH/Silver"
           databricks workspace mkdirs "$WORKSPACE_PATH/Gold"
@@ -37,7 +39,6 @@ jobs:
           databricks workspace import-dir citibike_etl/notebooks/bronze "$WORKSPACE_PATH/Bronze" --overwrite
           databricks workspace import-dir citibike_etl/notebooks/silver "$WORKSPACE_PATH/Silver" --overwrite
           databricks workspace import-dir citibike_etl/notebooks/gold   "$WORKSPACE_PATH/Gold"   --overwrite
-
 
 
 
