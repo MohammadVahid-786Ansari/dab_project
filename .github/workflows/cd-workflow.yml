@@ -40,10 +40,10 @@ jobs:
 
           echo "✅ Auth successful"
 
-          # ✅ Create workspace dirs (idempotent)
-          databricks workspace mkdirs "$WORKSPACE_PATH/Bronze"
-          databricks workspace mkdirs "$WORKSPACE_PATH/Silver"
-          databricks workspace mkdirs "$WORKSPACE_PATH/Gold"
+          # # ✅ Create workspace dirs (idempotent)
+          # databricks workspace mkdirs "$WORKSPACE_PATH/Bronze"
+          # databricks workspace mkdirs "$WORKSPACE_PATH/Silver"
+          # databricks workspace mkdirs "$WORKSPACE_PATH/Gold"
 
           # ✅ Import notebooks with overwrite
           databricks workspace import-dir citibike_etl/notebooks/01_bronze "$WORKSPACE_PATH/Bronze" --overwrite
