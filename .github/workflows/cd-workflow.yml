@@ -1,39 +1,42 @@
-name: Deploy Databricks Notebooks
+name: Deploy Notebooks to Databricks
 
 on:
   push:
     branches:
-      - main   # or dev, update as needed
+      - main
 
 jobs:
-  deploy-notebooks:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install Databricks CLI (Go version)
+      - name: Install Databricks CLI
         run: |
-          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+          curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | sh
 
       - name: Upload Notebooks to Databricks
         run: |
-          # Ensure workspace directories exist
+          # Export auth vars so Databricks CLI picks them up
+          export DATABRICKS_HOST="https://dbc-e380e487-14e8.cloud.databricks.com"
+          export DATABRICKS_TOKEN="${{ secrets.DB_token }}"
+
+          # Make sure workspace folders exist
           databricks workspace mkdirs $WORKSPACE_PATH/Bronze
           databricks workspace mkdirs $WORKSPACE_PATH/Silver
           databricks workspace mkdirs $WORKSPACE_PATH/Gold
           databricks workspace mkdirs $WORKSPACE_PATH/Utils
 
-          # Import local notebooks to Databricks workspace
+          # Import notebooks from repo into Databricks workspace
           databricks workspace import-dir citibike_etl/notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
           databricks workspace import-dir citibike_etl/notebooks/silver $WORKSPACE_PATH/Silver --overwrite
           databricks workspace import-dir citibike_etl/notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
           databricks workspace import-dir citibike_etl/notebooks/utils  $WORKSPACE_PATH/Utils  --overwrite
         env:
-          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com/
-          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
           WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
+
 
 
 
