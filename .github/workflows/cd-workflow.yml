@@ -6,70 +6,99 @@ on:
       - main
 
 jobs:
-  cd-deploy-dev:
-    name: Deploy to DEV
+  deploy-dev:
     runs-on: ubuntu-latest
-    environment: dev
+    # if: github.ref == 'refs/heads/dev'
+    env:
+      DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com/
+      DATABRICKS_TOKEN: ${{ secrets.DB_token }}
+      WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - uses: databricks/setup-cli@main
 
-      - name: Install Databricks CLI
-        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
-
-      - name: Install Dependencies
+      - name: Deploy Bronze/Silver/Gold/Utils to Dev
         run: |
-          pip install --upgrade pip
-          pip install setuptools wheel
+          databricks workspace import_dir ./notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
+          databricks workspace import_dir ./notebooks/silver $WORKSPACE_PATH/Silver --overwrite
+          databricks workspace import_dir ./notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
+          databricks workspace import_dir ./notebooks/utils  $WORKSPACE_PATH/Utils  --overwrite
 
-      - name: Configure Databricks
-        run: |
-          # write out the profile (here called "TEST")
-          cat <<EOF > ~/.databrickscfg
-          [DEFAULT]
-            host  = https://dbc-e380e487-14e8.cloud.databricks.com/
-            token = ${{ secrets.DB_token }}
-          EOF
 
-      - name: Deploy to DEV
-        run: |
-          databricks bundle deploy
+# name: CD Workflow
 
-  cd-deploy-test:
-    name: Deploy to TEST
-    runs-on: ubuntu-latest
-    environment: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+# on:
+#   push:
+#     branches:
+#       - main
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+# jobs:
+#   cd-deploy-dev:
+#     name: Deploy to DEV
+#     runs-on: ubuntu-latest
+#     environment: dev
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      - name: Install Databricks CLI
-        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.11'
 
-      - name: Install Dependencies
-        run: |
-          pip install --upgrade pip
-          pip install setuptools wheel
+#       - name: Install Databricks CLI
+#         run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
-      - name: Configure Databricks
-        run: |
-          # write out the profile (here called "TEST")
-          cat <<EOF > ~/.databrickscfg
-          [TEST]
-            host  = https://dbc-ba82de44-d338.cloud.databricks.com/
-            token = ${{ secrets.DB_token_test }}
-          EOF
+#       - name: Install Dependencies
+#         run: |
+#           pip install --upgrade pip
+#           pip install setuptools wheel
 
-      - name: Deploy to TEST
-        run: |
-          databricks bundle deploy --target test --profile TEST
+#       - name: Configure Databricks
+#         run: |
+#           # write out the profile (here called "TEST")
+#           cat <<EOF > ~/.databrickscfg
+#           [DEFAULT]
+#             host  = https://dbc-e380e487-14e8.cloud.databricks.com/
+#             token = ${{ secrets.DB_token }}
+#           EOF
+
+#       - name: Deploy to DEV
+#         run: |
+#           databricks bundle deploy
+
+#   cd-deploy-test:
+#     name: Deploy to TEST
+#     runs-on: ubuntu-latest
+#     environment: test
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.11'
+
+#       - name: Install Databricks CLI
+#         run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+#       - name: Install Dependencies
+#         run: |
+#           pip install --upgrade pip
+#           pip install setuptools wheel
+
+#       - name: Configure Databricks
+#         run: |
+#           # write out the profile (here called "TEST")
+#           cat <<EOF > ~/.databrickscfg
+#           [TEST]
+#             host  = https://dbc-ba82de44-d338.cloud.databricks.com/
+#             token = ${{ secrets.DB_token_test }}
+#           EOF
+
+#       - name: Deploy to TEST
+#         run: |
+#           databricks bundle deploy --target test --profile TEST
