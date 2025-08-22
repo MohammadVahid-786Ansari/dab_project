@@ -1,45 +1,59 @@
-name: Deploy Databricks Notebooks
+name: Deploy Notebooks to Databricks
 
 on:
   push:
     branches:
-      - main
+      - main  # adjust branch if needed
 
 jobs:
-  deploy-notebooks:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Install Databricks CLI (Go version)
+      - name: Install Databricks CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+          databricks -v
 
-      - name: Configure and Upload Notebooks
+      - name: Verify Auth
+        run: databricks current-user me
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}   # 👈 FIXED (must match your GitHub secret name)
-          WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+
+      - name: Create Bronze folder
+        run: databricks workspace mkdirs /Workspace/Bronze
+        env:
+          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+
+      - name: Create Silver folder
+        run: databricks workspace mkdirs /Workspace/Silver
+        env:
+          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+
+      - name: Create Gold folder
+        run: databricks workspace mkdirs /Workspace/Gold
+        env:
+          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+
+      - name: Create Utils folder
+        run: databricks workspace mkdirs /Workspace/Utils
+        env:
+          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+
+      - name: Import Notebooks
         run: |
-          # Check CLI + auth
-          databricks version
-          databricks current-user || { echo "❌ Auth failed - check DATABRICKS_TOKEN secret"; exit 1; }
-
-          # Create workspace dirs
-          databricks workspace mkdirs $WORKSPACE_PATH/Bronze
-          databricks workspace mkdirs $WORKSPACE_PATH/Silver
-          databricks workspace mkdirs $WORKSPACE_PATH/Gold
-
-          # Import notebooks
-          databricks workspace import-dir citibike_etl/notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
-          databricks workspace import-dir citibike_etl/notebooks/silver $WORKSPACE_PATH/Silver --overwrite
-          databricks workspace import-dir citibike_etl/notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
-
-
-
-
+          databricks workspace import-dir citibike_etl/notebooks /Workspace --overwrite
+        env:
+          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
 
 
 
