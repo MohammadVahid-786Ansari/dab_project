@@ -46,9 +46,9 @@ jobs:
           databricks workspace mkdirs "$WORKSPACE_PATH/Gold"
 
           # ✅ Import notebooks with overwrite
-          databricks workspace import-dir citibike_etl/notebooks/bronze "$WORKSPACE_PATH/Bronze" --overwrite
-          databricks workspace import-dir citibike_etl/notebooks/silver "$WORKSPACE_PATH/Silver" --overwrite
-          databricks workspace import-dir citibike_etl/notebooks/gold   "$WORKSPACE_PATH/Gold"   --overwrite
+          databricks workspace import-dir citibike_etl/notebooks/01_bronze "$WORKSPACE_PATH/Bronze" --overwrite
+          databricks workspace import-dir citibike_etl/notebooks/02_silver "$WORKSPACE_PATH/Silver" --overwrite
+          databricks workspace import-dir citibike_etl/notebooks/03_gold   "$WORKSPACE_PATH/Gold"   --overwrite
 
 
 # name: CD Workflow
