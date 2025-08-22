@@ -3,64 +3,38 @@ name: Deploy Databricks Notebooks
 on:
   push:
     branches:
-      - main   # Change branch if needed
+      - main   # or dev, update as needed
 
 jobs:
-  deploy:
+  deploy-notebooks:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Install Databricks CLI
-      - name: Install Databricks CLI
-        run: pip install databricks-cli --upgrade
-        env:
-          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com/
-          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
-
-      # Step 3: Ensure workspace folders exist
-      - name: Create Databricks workspace folders
+      - name: Install Databricks CLI (Go version)
         run: |
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Upload Notebooks to Databricks
+        run: |
+          # Ensure workspace directories exist
           databricks workspace mkdirs $WORKSPACE_PATH/Bronze
           databricks workspace mkdirs $WORKSPACE_PATH/Silver
           databricks workspace mkdirs $WORKSPACE_PATH/Gold
           databricks workspace mkdirs $WORKSPACE_PATH/Utils
+
+          # Import local notebooks to Databricks workspace
+          databricks workspace import-dir citibike_etl/notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
+          databricks workspace import-dir citibike_etl/notebooks/silver $WORKSPACE_PATH/Silver --overwrite
+          databricks workspace import-dir citibike_etl/notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
+          databricks workspace import-dir citibike_etl/notebooks/utils  $WORKSPACE_PATH/Utils  --overwrite
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com/
           DATABRICKS_TOKEN: ${{ secrets.DB_token }}
           WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
 
-      # Step 4: Delete old content (optional clean-up)
-      - name: Clean Databricks workspace folders
-        run: |
-          databricks workspace delete -r $WORKSPACE_PATH/Bronze || true
-          databricks workspace delete -r $WORKSPACE_PATH/Silver || true
-          databricks workspace delete -r $WORKSPACE_PATH/Gold   || true
-          databricks workspace delete -r $WORKSPACE_PATH/Utils  || true
-
-          databricks workspace mkdirs $WORKSPACE_PATH/Bronze
-          databricks workspace mkdirs $WORKSPACE_PATH/Silver
-          databricks workspace mkdirs $WORKSPACE_PATH/Gold
-          databricks workspace mkdirs $WORKSPACE_PATH/Utils
-        env:
-          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com/
-          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
-          WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
-
-      # Step 5: Import fresh notebooks
-      - name: Import notebooks into Databricks
-        run: |
-          databricks workspace import-dir citibike_etl/notebooks/bronze $WORKSPACE_PATH/Bronze
-          databricks workspace import-dir citibike_etl/notebooks/silver $WORKSPACE_PATH/Silver
-          databricks workspace import-dir citibike_etl/notebooks/gold   $WORKSPACE_PATH/Gold
-          databricks workspace import-dir citibike_etl/notebooks/utils  $WORKSPACE_PATH/Utils
-        env:
-          DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com/
-          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
-          WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
 
 
 # name: CD Workflow
