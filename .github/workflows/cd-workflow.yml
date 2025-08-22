@@ -19,7 +19,7 @@ jobs:
 
       - name: Debug secrets
         env:
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
         run: |
           if [ -z "$DATABRICKS_TOKEN" ]; then
             echo "❌ Token is EMPTY (secret not passed)"
@@ -30,7 +30,7 @@ jobs:
       - name: Configure and Upload Notebooks
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
           DATABRICKS_AUTH_TYPE: pat
           WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
         run: |
