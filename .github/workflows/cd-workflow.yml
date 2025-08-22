@@ -3,7 +3,7 @@ name: Deploy Databricks Notebooks
 on:
   push:
     branches:
-      - main   # adjust as needed
+      - main
 
 jobs:
   deploy-notebooks:
@@ -20,22 +20,23 @@ jobs:
       - name: Configure and Upload Notebooks
         env:
           DATABRICKS_HOST: https://dbc-e380e487-14e8.cloud.databricks.com
-          DATABRICKS_TOKEN: ${{ secrets.DB_token }}
+          DATABRICKS_TOKEN: ${{ secrets.DB_TOKEN }}   # 👈 FIXED (must match your GitHub secret name)
           WORKSPACE_PATH: /Workspace/Users/ansarivahid547@gmail.com/Dev
         run: |
-          # Confirm CLI + auth works
+          # Check CLI + auth
           databricks version
-          databricks workspace list $WORKSPACE_PATH || echo "Workspace path not found, creating it"
+          databricks current-user || { echo "❌ Auth failed - check DATABRICKS_TOKEN secret"; exit 1; }
 
-          # Create workspace directories if they don't exist
+          # Create workspace dirs
           databricks workspace mkdirs $WORKSPACE_PATH/Bronze
           databricks workspace mkdirs $WORKSPACE_PATH/Silver
           databricks workspace mkdirs $WORKSPACE_PATH/Gold
 
-          # Import local notebooks into Databricks workspace
+          # Import notebooks
           databricks workspace import-dir citibike_etl/notebooks/bronze $WORKSPACE_PATH/Bronze --overwrite
           databricks workspace import-dir citibike_etl/notebooks/silver $WORKSPACE_PATH/Silver --overwrite
           databricks workspace import-dir citibike_etl/notebooks/gold   $WORKSPACE_PATH/Gold   --overwrite
+
 
 
 
